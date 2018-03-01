@@ -4,13 +4,13 @@ from __future__ import unicode_literals
 from django.shortcuts import render
 
 # Create your views here.
-def receive_data(uuid, data):
+def get_all_product():
     pass
 
 
-def update_status(uuid, status):
+def create_transaction(sale_product, bill_info):
     pass
 
 
-def get_all_devices(online=True):
+def get_transaction(transaction_id):
     pass
