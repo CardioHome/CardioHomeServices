@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.shortcuts import render
-
 from connector import dispatch
+import remote_data
 
 # Create your views here.
 @dispatch
@@ -13,7 +12,7 @@ def get_user(user_id):
 
 @dispatch
 def add_home(user_id, target_user_id, home_id):
-    pass
+    remote_data.add_sensor_data()
 
 
 @dispatch

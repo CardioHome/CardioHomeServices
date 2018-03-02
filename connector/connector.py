@@ -31,7 +31,8 @@ FuncMap = {}
 def dispatch(func):
     def wrap(*args, **argv):
         return func(*args, **argv)
-
+    #q(a=1)
+    #q(1)
     FuncMap[func.__name__] = func
     return wrap
 
