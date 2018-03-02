@@ -18,8 +18,11 @@ from django.contrib import admin
 
 from pubsub.views import *
 
+from connector import handler
+from service.views import *
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
-
+    url(r'', handler)
 ]

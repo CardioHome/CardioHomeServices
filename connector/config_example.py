@@ -1,0 +1,7 @@
+auth = 'http://127.0.0.1:9000'
+collector = 'http://127.0.0.1:9001'
+data = 'http://127.0.0.1:9002'
+hippa = 'http://127.0.0.1:9003'
+notification = 'http://127.0.0.1:9004'
+payment = 'http://127.0.0.1:9005'
+pubsub = 'http://127.0.0.1:9006'

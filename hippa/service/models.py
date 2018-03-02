@@ -21,6 +21,7 @@ Prefix = (
     (0, 'Dr.'),
     (1, 'Sr.')
 )
+
 class PatientInfo():
     user_id = models.IntegerField()
     age = models.IntegerField()

@@ -1,21 +1,25 @@
+from connector import register
+from config import pubsub
+from functools import partial
 
-from connector import dispatch
+register = partial(register, server=pubsub)
 
-@dispatch
+
+@register
 def publish(publisher_id, event_name, data):
     pass
 
 
-@dispatch
+@register
 def subscribe(subscriber_id, event_name, callback_url):
     pass
 
 
-@dispatch
+@register
 def unsubscribe(subscriber_id, event_name):
     pass
 
 
-@dispatch
+@register
 def unsubscribe_all(subscriber_id):
     pass
