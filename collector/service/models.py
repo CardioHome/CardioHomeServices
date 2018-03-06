@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 
+
 # Create your models here.
 class BaseModel(models.Model):
     delete_time = models.DateTimeField()
@@ -17,6 +18,8 @@ DeviceType = (
 DeviceStatus = (
     (0, 'offline')
 )
+
+
 class Device(BaseModel):
     display_name = models.CharField(max_length=100)
     device_type = models.IntegerField(choices=DeviceType)

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="PYTHON_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$/auth" />
+    <content url="file://$MODULE_DIR$/collector" />
+    <content url="file://$MODULE_DIR$/connector" />
+    <content url="file://$MODULE_DIR$/data" />
+    <content url="file://$MODULE_DIR$/hippa" />
+    <content url="file://$MODULE_DIR$/notification" />
+    <content url="file://$MODULE_DIR$/payment" />
+    <content url="file://$MODULE_DIR$/pubsub" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+  <component name="TestRunnerService">
+    <option name="PROJECT_TEST_RUNNER" value="Unittests" />
+  </component>
+</module>

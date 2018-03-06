@@ -10,7 +10,11 @@ def get_user(user_id):
     pass
 
 @register
-def add_home(user_id, target_user_id, home_id):
+def add_user_to_home(user_id, target_user_id, home_id):
+    pass
+
+@register
+def create_home(map_data):
     pass
 
 @register
