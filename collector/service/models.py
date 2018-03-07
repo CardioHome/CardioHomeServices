@@ -5,22 +5,25 @@ from django.db import models
 from django.contrib.postgres.fields import JSONField
 
 
-# Create your models here.
 class BaseModel(models.Model):
-    delete_time = models.DateTimeField()
+    delete_time = models.DateTimeField(null=True)
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
 
-DeviceType = (
-    (0, 'smart fork')
-)
-
-DeviceStatus = (
-    (0, 'offline')
-)
-
 
 class Device(BaseModel):
+    DeviceType = (
+        (0, 'smart fork'),
+        (1, 'pill dispenser'),
+        (2, 'heart sensor'),
+        (3, 'temperature sensor')
+    )
+
+    DeviceStatus = (
+        (0, 'offline'),
+        (1, 'online'),
+    )
+
     display_name = models.CharField(max_length=100)
     device_type = models.IntegerField(choices=DeviceType)
     status = models.IntegerField(choices=DeviceStatus)
@@ -29,5 +32,5 @@ class Device(BaseModel):
 
 
 class RawData(BaseModel):
-    device = models.ForeignKey(Device, on_delete=models.CASCADE)
+    sensor = models.ForeignKey(Device, on_delete=models.CASCADE)
     data = JSONField()

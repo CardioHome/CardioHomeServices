@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from datetime import datetime
 
 from connector import dispatch
 import remote_data
 
 from .models import *
-
+from django.contrib.auth.models import User
+from django.db import DatabaseError, transaction
 
 # Create your views here.
 @dispatch
@@ -14,13 +16,14 @@ def get_user(user_id):
     Retrieves user information from the given user_id if available in the Stakeholder table. 
     
     :param user_id: id number of the user to be retrieved from the database
-    :return: if successful, returns str(user_id), otherwise return error message 
+    :return: if successful, returns str(user_id), else return None 
     """
 
     try:
         user = Stakeholder.objects.all().filter(pk=user_id)[0]
     except LookupError:
-        user = "User with user id: " + user_id + " does not exist."
+        # if connector supports exception, should raise userDoesNotExist
+        user = None
     return user
     # all() -> SELECT * FROM stakeholder;
     # all().filter(nick_name = 'a') -> SELECT * FROM stakeholder WHERE nick_name = 'a';
@@ -39,18 +42,29 @@ def add_user_to_home(user_id, target_user_id, home_id):
 
     try:
         user = Stakeholder.objects.all().filter(pk=user_id)[0]
+
+        # only patient, doctor, family member and customer service can add a user to a home
+        if user.role not in (0, 1, 2, 5):
+            return
+
+        if not user.role == 5 and not user.home.objects.all().filter(pk=home_id).exists():
+            return
+
+        home = Home.objects.all().filter(pk=home_id)[0]
+        target_user = Stakeholder.objects.all().filter(pk=target_user_id)[0]
+
+        # user is a patient and has a home
+        if target_user.role == 0 and target_user.home.count() > 0:
+            return
+
+        if target_user.home.filter(pk=home.pk):
+            return
+
+        target_user.home.add(home)
+
+        target_user.save()
     except LookupError:
-        return "Unable to find user with id: " + user_id
-    try:
-        home = user.home.objects.all().filter(pk=home_id)[0]
-    except LookupError:
-        return "Unable to find home with id: " + home_id
-    try:
-        home.pk = Stakeholder.objects.all().filter(pk=target_user_id)[0].pk
-        #TODO: Call the cache module to make this change
-        home.save()
-    except LookupError:
-        return "Unable to find user to add with id: " + target_user_id
+        return
 
 
 @dispatch
@@ -61,11 +75,12 @@ def create_home(map_data):
     :param map_data: dictionary containing all key-value attributes of a Home object
     :return: Home object
     """
-
-    home = Home(**map_data)
-
-    #TODO: placeholder, need cache module to handle this???
-    home.save()
+    try:
+        home = Home(**map_data)
+        home.save()
+    except Exception as e:
+        raise e
+        return
 
     return home
 
@@ -81,29 +96,39 @@ def edit_user(user_id, data):
     """
 
     try:
-        user = Stakeholder.objects.all().filter(pk=user_id)[0]
+        user = Stakeholder.objects.all().filter(pk=user_id)
         user.update(**data)
     except LookupError:
-        return "Unable to find user with id: " + user_id
-    return user
+        return
+    return user[0]
 
 
 @dispatch
-def signup(username, password, reg_key, data={}):
+def signup(username, password, email, reg_key, data={}):
     """
-    Creates a new user in the Stakeholder table with the username, password, reg_key and data.
+    Creates a new django user and user in the Stakeholder table with the username, password, email, reg_key and data.
     
     :param username: 
     :param password: 
+    :param email:
     :param reg_key: 
     :param data: 
     :return: 
     """
 
-    user = Stakeholder(username=username, password=password, reg_key=reg_key)
+    try:
+        register_key = RegisterKey.objects.all().filter(key=reg_key)[0]
 
-    #TODO: For cache module
-    user.save();
+        with transaction.atomic():
+            django_user = User(username=username, password=password, email=email)
+            django_user.save()
+
+            user = Stakeholder(django_user=django_user, organization=register_key.organization,  **data)
+            user.save()
+            register_key.delete_time = datetime.now()
+            register_key.save()
+    except LookupError:
+        return
 
     return user
 
@@ -115,18 +140,19 @@ def login(username, password):
     
     :param username: 
     :param password: 
-    :return: user from Stakeholder table with the corresponding user name 
+    :return: user from Stakeholder table with the corresponding username 
     """
 
     try:
-        user = Stakeholder.objects.all().filter(usrename=username, password=password)[0]
+        django_user = User.objects.all().filter(username=username, password=password)[0]
     except LookupError:
-        return "Username and/or password is incorrect."
+        return
 
-    return user
+    return django_user.stakeholder
+
 
 @dispatch
-def generate_reg_key(role, org=None):
+def generate_reg_key(role, org_id, org=0):
     """
     Generates a key for new users signing up to the CardioHome service.
     
@@ -134,12 +160,16 @@ def generate_reg_key(role, org=None):
     :param org: organization the user belongs to
     :return: a key generated by using the role and organization
     """
-    organization = Organization(name=org, org_type=org)
-    hash_key = abs(hash(str(role) + str(org)))
-    reg_key = RegisterKey(role=role, organization=org, key=hash_key)
 
-    #TODO: Call cache module
-    reg_key.save()
+    try:
+        organization = Organization.objects.all().filter(pk=org_id, org_type=org)[0]
+        hash_key = abs(hash(str(role) + str(org_id)))
+        reg_key = RegisterKey(role=role, organization=organization, key=hash_key)
+
+        #TODO: Call cache module
+        reg_key.save()
+    except LookupError:
+        return
 
     return reg_key
 
@@ -150,7 +180,7 @@ def get_reg_key(key):
     Retrieves the reg_key from the RegisterKey table specified by the given key.
     
     :param key: 
-    :return: 
+    :return: a RegisterKey object corresponding to the key
     """
 
-    pass
+    return RegisterKey.objects.all().filter(delete_time=None, key=key)[0]
