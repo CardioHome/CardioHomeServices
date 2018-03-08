@@ -49,4 +49,4 @@ class Transaction(BaseModel):
     order_type = models.IntegerField(choices=OrderType)
 
     def __str__(self):
-        return "transaction_id: " + str(self.transaction_id)
+        return "reference_id: " + str(self.reference_id)
