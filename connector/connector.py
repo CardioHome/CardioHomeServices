@@ -56,7 +56,9 @@ class Encoder(json.JSONEncoder):
 
 
 def convert(data):
-    if isinstance(data, QuerySet) or isinstance(data, list):
+    if data is None or isinstance(data, str):
+        return data
+    elif isinstance(data, QuerySet) or isinstance(data, list):
         return [json.loads(json.dumps(model_to_dict(o), cls=Encoder)) for o in data]
     else:
         return json.loads(json.dumps(model_to_dict(data), cls=Encoder))

@@ -70,7 +70,7 @@ mapping = {k: v for k, v in States}
 
 
 class BaseModel(models.Model):
-    delete_time = models.DateTimeField(null=True)
+    delete_time = models.DateTimeField(blank=True, null=True)
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
 

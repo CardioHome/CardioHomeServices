@@ -4,8 +4,10 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 
+import uuid
+
 class BaseModel(models.Model):
-    delete_time = models.DateTimeField()
+    delete_time = models.DateTimeField(blank=True, null=True)
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
 
@@ -24,14 +26,19 @@ OrderType = (
     (3, 'clinic premium')
 )
 
+
 class SaleProduct(BaseModel):
     display_name = models.CharField(max_length=100)
     price = models.IntegerField()
     type = models.IntegerField(choices=OrderType)
 
+    def __str__(self):
+        return self.display_name
+
+
 # Create your models here.
 class Transaction(BaseModel):
-    transaction_id = models.UUIDField()
+    transaction_id = models.UUIDField(default=uuid.uuid4)
     credit_card_number = models.CharField(max_length=100)
     reference_id = models.CharField(max_length=100)
     amount = models.IntegerField()
@@ -40,3 +47,6 @@ class Transaction(BaseModel):
     last_name = models.CharField(max_length=100)
     bill_address = JSONField()
     order_type = models.IntegerField(choices=OrderType)
+
+    def __str__(self):
+        return "transaction_id: " + str(self.transaction_id)
