@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from datetime import datetime
+from django.core.cache import cache
 
+import time
 from connector import dispatch
 import remote_data
 
@@ -9,7 +11,18 @@ from .models import *
 from django.contrib.auth.models import User
 from django.db import DatabaseError, transaction
 
-# Create your views here.
+
+@dispatch
+def get_user_id(token):
+    """
+    Retrieves a user_id with the given token.
+    
+    :param token: hashed string
+    :return: user_id 
+    """
+    return cache.get(token)
+
+
 @dispatch
 def get_user(user_id):
     """
@@ -18,6 +31,7 @@ def get_user(user_id):
     :param user_id: id number of the user to be retrieved from the database
     :return: if successful, returns str(user_id), else return None 
     """
+    return User()
 
     try:
         user = Stakeholder.objects.all().filter(pk=user_id)[0]
@@ -86,6 +100,21 @@ def create_home(map_data):
 
 
 @dispatch
+def get_home(home_id):
+    """
+
+    :param home_id: 
+    :return: 
+    """
+    try:
+        home = Home.objects.all().filter(pk=home_id)[0]
+    except LookupError:
+        return
+
+    return home
+
+
+@dispatch
 def edit_user(user_id, data):
     """
     Makes changes to the user specified by user_id with data.
@@ -98,6 +127,7 @@ def edit_user(user_id, data):
     try:
         user = Stakeholder.objects.all().filter(pk=user_id)
         user.update(**data)
+        user.save()
     except LookupError:
         return
     return user[0]
@@ -140,15 +170,33 @@ def login(username, password):
     
     :param username: 
     :param password: 
-    :return: user from Stakeholder table with the corresponding username 
+    :return: a string token 
     """
 
     try:
         django_user = User.objects.all().filter(username=username, password=password)[0]
+        token = hash(username+str(time.time()))
+        user_id = django_user.pk
     except LookupError:
         return
 
-    return django_user.stakeholder
+    return renew_token(token, user_id)
+
+
+@dispatch
+def renew_token(token, user_id=None):
+    """
+    Renews a token for a particular user with user_id.
+    
+    :param token: 
+    :param user_id: 
+    :return: renewed token if token still exists for user w/ user_id, else None
+    """
+
+    user_id = user_id or cache.get(token)
+    if user_id:
+        cache.set(token, user_id, timeout=86400)
+    return token
 
 
 @dispatch

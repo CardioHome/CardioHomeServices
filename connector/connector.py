@@ -6,6 +6,8 @@ import traceback
 
 from django.http.response import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.core import serializers
+from django.db import models
 
 def register(func, server):
     def wrap(*args, **argv):
@@ -37,6 +39,16 @@ def dispatch(func):
     return wrap
 
 
+def convert(data):
+    if isinstance(data, models.Model):
+        return json.loads(serializers.serialize("json", [data]))[0]
+    elif isinstance(data, list):
+        return [convert(d) for d in data]
+    elif isinstance(data, dict):
+        return {k: convert(v) for k, v in data}
+    else:
+        return data
+
 @csrf_exempt
 def handler(req):
     bundle = json.loads(req.body.decode('utf-8'))
@@ -50,9 +62,10 @@ def handler(req):
 
     try:
         result = FuncMap[name](*args, **argv)
+
         return JsonResponse({
             'error': '',
-            'result': result
+            'result': convert(result)
         })
     except Exception as e:
         return JsonResponse({

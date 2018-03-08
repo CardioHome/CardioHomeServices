@@ -4,6 +4,9 @@ from functools import partial
 
 register = partial(register, server=auth)
 
+@register
+def get_user_id(token):
+    pass
 
 @register
 def get_user(user_id):
@@ -18,6 +21,10 @@ def create_home(map_data):
     pass
 
 @register
+def get_home(home_id):
+    pass
+
+@register
 def edit_user(user_id, data):
     pass
 
@@ -27,6 +34,10 @@ def signup(username, password, email, reg_key, data={}):
 
 @register
 def login(username, password):
+    pass
+
+@register
+def renew_token(token):
     pass
 
 @register
