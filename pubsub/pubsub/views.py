@@ -1,5 +1,6 @@
-
 from connector import dispatch
+from django.core.cache import cache
+
 
 @dispatch
 def publish(publisher_id, event_name, data):

@@ -13,10 +13,12 @@ class BaseModel(models.Model):
 
 class Device(BaseModel):
     DeviceType = (
-        (0, 'smart fork'),
-        (1, 'pill dispenser'),
-        (2, 'heart sensor'),
-        (3, 'temperature sensor')
+        (0, 'electrocardiogram'),
+        (1, 'smart fork'),
+        (2, 'body temperature sensor'),
+        (3, 'pill dispenser'),
+        (4, 'stress sensor'),
+        (5, 'exercise activity sensor'),
     )
 
     DeviceStatus = (
@@ -30,7 +32,13 @@ class Device(BaseModel):
     home_id = models.IntegerField()
     uuid = models.UUIDField()
 
+    def __str__(self):
+        return "uuid: " + self.uuid + ", Name: " + self.display_name + ", Device type: " + self.device_type
+
 
 class RawData(BaseModel):
     sensor = models.ForeignKey(Device, on_delete=models.CASCADE)
     data = JSONField()
+
+    def __str__(self):
+        return "uuid: " + self.sensor.uuid
