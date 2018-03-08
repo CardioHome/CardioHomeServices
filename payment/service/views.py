@@ -68,7 +68,8 @@ def edit_product(map_data):
             print("product "+display_name + " does not exist")
             return
         product.update(**map_data)
-        product[0].save()
+        for p in product:
+            p.save();
         return product
     except LookupError:
         print("LookupError when editing product: " + display_name)
@@ -109,6 +110,30 @@ def create_transaction(map_data):
         transaction = Transaction(**map_data)
         transaction.save()
         return transaction
+    except LookupError:
+        print("LookupError when creating transaction: reference_id: " + str(reference_id))
+
+
+@dispatch
+def edit_transaction(map_data):
+    """
+    Create a transaction
+    :param map_data: Dictionary of all members in the transaction
+    :return: transaction
+    """
+    try:
+        reference_id = map_data.get("reference_id")
+        if reference_id is None:
+            print("reference_id is None")
+            return
+        transactions = Transaction.objects.all().filter(reference_id=reference_id)
+        if not transactions.exists():
+            print("reference "+str(reference_id) + " already exists")
+            return
+        transactions.update(**map_data)
+        for t in transactions:
+            t.save();
+        return transactions
     except LookupError:
         print("LookupError when creating transaction: reference_id: " + str(reference_id))
 

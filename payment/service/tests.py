@@ -60,6 +60,16 @@ class PaymentWorkflow(TransactionTestCase):
         transactions = get_transaction(102)
         self.assertIsNone(transactions)
 
+        # test edit_transaction
+        transactions = edit_transaction({"amount": 11, "status": 21, "bill_address": "bill_address1", "order_type": 1, "credit_card_number": 12,"reference_id": 101})
+        self.assertIsNotNone(transactions)
+        self.assertEqual(transactions[0].order_type, 1)
+
+        transactions = get_transaction(101)
+        self.assertIsNotNone(transactions)
+        self.assertEqual(transactions.count(), 1)
+        self.assertEqual(transactions[0].order_type, 1)
+
 
 
 
