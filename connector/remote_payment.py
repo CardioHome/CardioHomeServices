@@ -11,10 +11,26 @@ def get_all_product():
 
 
 @register
-def create_transaction(sale_product, bill_info):
+def add_product(map_data):
+    pass
+
+
+@register
+def edit_product(map_data):
+    pass
+
+
+@register
+def get_product(display_name):
+    pass
+
+
+@register
+def create_transaction(map_data):
     pass
 
 
 @register
 def get_transaction(transaction_id):
     pass
+
