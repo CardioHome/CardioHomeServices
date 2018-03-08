@@ -34,22 +34,9 @@ def get_data(home_id, start_time, end_time, data_type=()):
 
     try:
         home = remote_auth.get_home(home_id)
-        filtered_patient_data_set = []
-
-        filtered_data_set = PatientData.objects.filter(data_type__in=data_type).\
+        filtered_patient_data_set = PatientData.objects.filter(data_type__in=data_type).\
                                                 exclude(creation_time__gte=end_time).\
                                                 filter(creation_time__gte=start_time)
-
-        for data in filtered_data_set:
-            filtered_patient_data_set.append({'device_uuid': data.device_uuid,
-                                              'home_id': data.home_id,
-                                              'data_type': data.data_type,
-                                              'int_val1': data.int_val1,
-                                              'int_val2': data.int_val2,
-                                              'flt_val1': data.flt_val1,
-                                              'flt_val2': data.flt_val2,
-                                              'str_val': data.str_val,
-                                              'device_create_time': data.device_create_time})
     except LookupError:
         return
 
