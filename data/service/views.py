@@ -21,6 +21,7 @@ def add_sensor_data(device_uuid, home_id, data, data_type, device_create_time):
     try:
         patient_data = PatientData.objects.all().filter(device_uuid=device_uuid, home_id=home_id, data_type=data_type)
         patient_data.device_create_time = device_create_time
+        patient_data.update(**data)
         patient_data.save()
         data = PatientData(**data)
         data.save()

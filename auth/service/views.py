@@ -31,7 +31,6 @@ def get_user(user_id):
     :param user_id: id number of the user to be retrieved from the database
     :return: if successful, returns str(user_id), else return None 
     """
-    return User()
 
     try:
         user = Stakeholder.objects.all().filter(pk=user_id)[0]
