@@ -33,11 +33,11 @@ def get_user(user_id):
     """
 
     try:
-        user = Stakeholder.objects.all().filter(pk=user_id)[0]
+        return Stakeholder.objects.all().filter(pk=user_id)[0]
     except LookupError:
         # if connector supports exception, should raise userDoesNotExist
-        user = None
-    return user
+        return None
+
     # all() -> SELECT * FROM stakeholder;
     # all().filter(nick_name = 'a') -> SELECT * FROM stakeholder WHERE nick_name = 'a';
 
@@ -91,11 +91,9 @@ def create_home(map_data):
     try:
         home = Home(**map_data)
         home.save()
+        return home
     except Exception as e:
         raise e
-        return
-
-    return home
 
 
 @dispatch
@@ -106,11 +104,9 @@ def get_home(home_id):
     :return: 
     """
     try:
-        home = Home.objects.all().filter(pk=home_id)[0]
+        return Home.objects.all().filter(pk=home_id)[0]
     except LookupError:
         return
-
-    return home
 
 
 @dispatch
@@ -124,12 +120,12 @@ def edit_user(user_id, data):
     """
 
     try:
-        user = Stakeholder.objects.all().filter(pk=user_id)
+        user = Stakeholder.objects.all().filter(pk=user_id)[0]
         user.update(**data)
         user.save()
+        return user
     except LookupError:
         return
-    return user[0]
 
 
 @dispatch
@@ -156,10 +152,9 @@ def signup(username, password, email, reg_key, data={}):
             user.save()
             register_key.delete_time = datetime.now()
             register_key.save()
+            return user
     except LookupError:
         return
-
-    return user
 
 
 @dispatch
@@ -176,19 +171,18 @@ def login(username, password):
         django_user = User.objects.all().filter(username=username, password=password)[0]
         token = hash(username+str(time.time()))
         user_id = django_user.pk
+        return renew_token(token, user_id)
     except LookupError:
         return
-
-    return renew_token(token, user_id)
 
 
 @dispatch
 def renew_token(token, user_id=None):
     """
     Renews a token for a particular user with user_id.
-    
-    :param token: 
-    :param user_id: 
+
+    :param token:
+    :param user_id:
     :return: renewed token if token still exists for user w/ user_id, else None
     """
 
@@ -212,13 +206,10 @@ def generate_reg_key(role, org_id, org=0):
         organization = Organization.objects.all().filter(pk=org_id, org_type=org)[0]
         hash_key = abs(hash(str(role) + str(org_id)))
         reg_key = RegisterKey(role=role, organization=organization, key=hash_key)
-
-        #TODO: Call cache module
         reg_key.save()
+        return reg_key
     except LookupError:
         return
-
-    return reg_key
 
 
 @dispatch

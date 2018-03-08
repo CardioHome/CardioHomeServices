@@ -11,7 +11,7 @@ import remote_data
 def add_device_to_home(user_id, home_id, uuid, device_type, data={}):
     """
     Adds device with uuid specified with its type to the user with user_id.
-    
+
     :param user_id:
     :param home_id:
     :param uuid: 
@@ -21,35 +21,37 @@ def add_device_to_home(user_id, home_id, uuid, device_type, data={}):
     """
 
     try:
-        user = remote_auth.get_user(user_id)
-        home = remote_auth.get_home(home_id)
+        if not remote_auth.get_user(user_id) or not remote_auth.get_home(home_id):
+            return
+
         device = Device(uuid=uuid, device_type=device_type, home_id=home_id, **data)
         device.save()
-
+        return device
     except LookupError:
         return
-    return device
 
 
 @dispatch
-def receive_data(uuid, data, device_create_time):
+def receive_data(data):
     """
     Receives the data of the device specified by uuid. Only receives the data if device w/ uuid exists in the 
     Device table.
-    
-    :param uuid: 
-    :param data: 
-    :param device_create_time:
+
+    :param data:
     :return: data entry from the RawData table
+
     """
     try:
-        device = Device.objects.all().filter(uuid=uuid)[0]
+        device = Device.objects.all().filter(uuid=data['uuid'])[0]
+        if not device:
+            return
         raw_data = RawData(sensor=device, data=data)
+        raw_data.save()
         processed_data = covert_device_to_patient_data(device, raw_data)
 
         # add data to data service
-        remote_data.add_sensor_data(uuid, device.home_id, processed_data, device.device_type, device_create_time)
-        raw_data.save()
+        remote_data.add_sensor_data(data)
+
     except LookupError:
         return
 
@@ -118,9 +120,9 @@ def update_status(uuid, status):
         device = Device.objects.all().filter(uuid=uuid)[0]
         device.status = status
         device.save()
+        return device
     except LookupError:
         return
-    return device
 
 
 @dispatch
@@ -132,8 +134,8 @@ def get_all_devices(home_id):
     :return: list of device objects from Device table
     """
     try:
-        devices = Device.objects.all().filter(home_id=home_id)
+        return Device.objects.all().filter(home_id=home_id)
     except LookupError:
         return
 
-    return devices
+

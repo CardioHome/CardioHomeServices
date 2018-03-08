@@ -6,14 +6,14 @@ from unittest.mock import patch
 from django.test import TestCase
 import remote_auth
 import remote_data
-import time
+import datetime
 import uuid
 
 # dependency injected functions
 
 def _add_sensor_data(*args):
     return {
-        'device_uuid': '00010002000300040005000600070008',
+        'uuid': uuid.uuid4(),
         'home_id': 1,
         'data_type': 0,
         'int_val1': 95,
@@ -21,7 +21,7 @@ def _add_sensor_data(*args):
         'flt_val1': None,
         'flt_val2': None,
         'str_val': "",
-        'device_create_time': time.time(),
+        'device_create_time': datetime.datetime.now(),
     }
 
 
@@ -50,10 +50,10 @@ def _get_home(*args):
         'tz': 'PST',
     }
 
+
 class DeviceManagement(TestCase):
     def test_device_management(self):
         with patch('remote_data.add_sensor_data', new=_add_sensor_data):
-            remote_data.add_sensor_data()
 
             with patch('remote_auth.get_user', new=_get_user):
                 user = remote_auth.get_user()
@@ -86,3 +86,20 @@ class DeviceManagement(TestCase):
 
                     self.assertDictEqual(test_dic, device_dic)
 
+                    device_create_time = datetime.datetime.now()
+                    sensor_data = remote_data.add_sensor_data()
+                    receive_data(sensor_data)
+
+                    device = update_status(uid, 0)
+                    self.assertEqual(device.status, 0)
+
+                    data2 = {
+                        'display_name': 'Smart fork',
+                        'status': 1,
+                    }
+
+                    # add multiple devices and test retrieval
+                    device2 = add_device_to_home(user_id, home_id, sensor_data['uuid'], 1, data2)
+                    device_set = get_all_devices(home_id)
+
+                    print(device_set)

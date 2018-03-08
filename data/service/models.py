@@ -9,6 +9,9 @@ class BaseModel(models.Model):
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        abstract = True
+
 
 class PatientData(BaseModel):
 
@@ -16,12 +19,12 @@ class PatientData(BaseModel):
         (0, 'heart rate'),
         (1, 'nutritional intake'),
         (2, 'body temperature'),
-        (3, 'medication intake')
+        (3, 'medication intake'),
         (4, 'stress level'),
         (5, 'exercise activity'),
     )
 
-    device_uuid = models.UUIDField()
+    uuid = models.UUIDField()
     home_id = models.IntegerField()
     data_type = models.IntegerField(choices=DataType)
     int_val1 = models.IntegerField(blank=True, null=True)
@@ -32,4 +35,4 @@ class PatientData(BaseModel):
     device_create_time = models.DateTimeField()
 
     def __str__(self):
-        return "uuid: " + str(self.device_uuid) + ", data type: " + str(self.data_type)
+        return "uuid: " + str(self.uuid) + ", data type: " + str(self.data_type)

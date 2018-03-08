@@ -10,6 +10,9 @@ class BaseModel(models.Model):
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        abstract = True
+
 
 class Device(BaseModel):
     DeviceType = (
@@ -33,7 +36,7 @@ class Device(BaseModel):
     uuid = models.UUIDField()
 
     def __str__(self):
-        return "uuid: " + self.uuid + ", Name: " + self.display_name + ", Device type: " + self.device_type
+        return "uuid: " + str(self.uuid) + ", Name: " + self.display_name + ", Device type: " + str(self.device_type)
 
 
 class RawData(BaseModel):
