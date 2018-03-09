@@ -1,5 +1,5 @@
 auth = 'http://127.0.0.1:9000'
-collector = 'http://127.0.0.1:9001'
+device_manager = 'http://127.0.0.1:9001'
 data = 'http://127.0.0.1:9002'
 hippa = 'http://127.0.0.1:9003'
 notification = 'http://127.0.0.1:9004'

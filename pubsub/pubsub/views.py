@@ -2,7 +2,10 @@ from urllib import request
 import json
 
 from django.core.cache import cache
+
 from connector import dispatch
+from django.core.cache import cache
+
 
 
 def __get_event(event_name):

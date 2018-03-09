@@ -6,10 +6,10 @@ register = partial(register, server=data)
 
 
 @register
-def add_sensor_data(device_uuid, home_id, data, type):
+def add_sensor_data(data):
     pass
 
 
 @register
-def get_data(home_id, data_type=()):
+def get_data(home_id, start_time, end_time, data_type=()):
     pass
