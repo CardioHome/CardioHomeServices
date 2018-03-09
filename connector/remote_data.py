@@ -1,3 +1,5 @@
+__author__ = 'Simon'
+
 from connector import register
 from config import data
 from functools import partial

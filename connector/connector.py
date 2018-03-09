@@ -1,3 +1,5 @@
+__author__ = 'Simon'
+
 import json
 import inspect
 from urllib import request

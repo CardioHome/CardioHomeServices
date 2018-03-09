@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+__author__ = 'Fung'
+
 from __future__ import unicode_literals
 from datetime import datetime
 from django.core.cache import cache

@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-
+__author__ = ['Simon']
 # Create your models here.
 
 class NotificationTrigger(models.Model):

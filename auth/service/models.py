@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+__author__ = ['Fung', 'Simon']
+
 from __future__ import unicode_literals
 
 from django.db import models
